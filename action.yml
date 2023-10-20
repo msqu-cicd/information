@@ -39,6 +39,7 @@ outputs:
 runs:
   using: "composite"
   steps:
+  
     - id: branch
       run: |
         # "Set branch names..."
@@ -72,6 +73,7 @@ runs:
           fi
         fi
       shell: bash
+
     - id: current_branch
       run: |
         # "Set the current branch name..."
@@ -91,6 +93,7 @@ runs:
           fi
         fi
       shell: bash
+
     - id: default
       run: |
         # "Set the default branch name..."
@@ -114,6 +117,7 @@ runs:
           fi
         fi
       shell: bash
+
     - id: tag
       run: |
         # "Set the tag name..."
@@ -136,6 +140,7 @@ runs:
           fi
         fi
       shell: bash
+    
     - id: ci_hostname
       run: |
         CI_HOSTNAME=$(echo $GITHUB_SERVER_URL | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
