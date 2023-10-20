@@ -1,0 +1,147 @@
+name: Branch Names
+description: Retrieve github branch or tag information without the /ref/* prefix
+author: tj-actions
+inputs:
+  strip_tag_prefix:
+    description: 'The prefix that should be stripped from the tag e.g `v` -> with a tag `v0.0.1` -> returns `0.0.1`'
+    default: ''
+    required: false
+
+outputs:
+  ci_hostname:
+    value: ${{ steps.default.outputs.ci_hostname }}
+    description: "ci server hostname with http(s) prefix"
+  is_default:
+    value: ${{ steps.default.outputs.is_default }}
+    description: 'Returns `"true"` if the current branch is the default else `"false"`.'
+  is_tag:
+    value: ${{ steps.tag.outputs.is_tag }}
+    description: 'Returns `"true"` if the current branch is a tag else `"false"`.'
+  default_branch:
+    value: ${{ steps.default.outputs.default_branch }}
+    description: 'The default branch name e.g `main` OR `master`'
+  current_branch:
+    value: ${{ steps.current_branch.outputs.current_branch }}
+    description: 'The current branch name regardless of event_type e.g `main`, `feature/test`'
+  base_ref_branch:
+    value: ${{ steps.branch.outputs.base_ref_branch }}
+    description: 'The target branch of a pull request or tag e.g `main`'
+  head_ref_branch:
+    value: ${{ steps.branch.outputs.head_ref_branch }}
+    description: 'The source branch of a pull request e.g `feature/test`'
+  ref_branch:
+    value: ${{ steps.branch.outputs.ref_branch }}
+    description: 'The branch that triggered the workflow run. e.g `1/merge`, `main`'
+  tag:
+    value: ${{ steps.tag.outputs.tag }}
+    description: 'The tag that triggered the workflow run. e.g `v0.0.1`, `0.0.1`'
+
+runs:
+  using: "composite"
+  steps:
+    - id: branch
+      run: |
+        # "Set branch names..."
+        if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
+          BASE_REF=$(printf "%q" "${{ github.event.pull_request.base.ref || github.base_ref }}")
+          HEAD_REF=$(printf "%q" "${{ github.event.pull_request.head.ref || github.head_ref }}")
+          REF=$(printf "%q" "${{ github.ref }}")
+
+          BASE_REF=${BASE_REF/refs\/heads\//}
+          HEAD_REF=${HEAD_REF/refs\/heads\//}
+          REF_BRANCH=${REF/refs\/pull\//}
+          REF_BRANCH=${REF_BRANCH/refs\/heads\//}
+          
+          if [[ -z "$GITHUB_OUTPUT" ]]; then
+            echo "::set-output name=base_ref_branch::$(eval printf "%s" "$BASE_REF")"
+            echo "::set-output name=head_ref_branch::$(eval printf "%s" "$HEAD_REF")"
+            echo "::set-output name=ref_branch::$(eval printf "%s" "$REF_BRANCH")"
+          else
+            echo "base_ref_branch=$(eval printf "%s" "$BASE_REF")" >> "$GITHUB_OUTPUT"
+            echo "head_ref_branch=$(eval printf "%s" "$HEAD_REF")" >> "$GITHUB_OUTPUT"
+            echo "ref_branch=$(eval printf "%s" "$REF_BRANCH")" >> "$GITHUB_OUTPUT"
+          fi
+        else
+          BASE_REF=$(printf "%q" "${{ github.event.base_ref }}")
+          BASE_REF=${BASE_REF/refs\/heads\/${{ inputs.strip_tag_prefix }}/}
+          
+          if [[ -z "$GITHUB_OUTPUT" ]]; then
+            echo "::set-output name=base_ref_branch::$(eval printf "%s" "$BASE_REF")"
+          else
+            echo "base_ref_branch=$(eval printf "%s" "$BASE_REF")" >> "$GITHUB_OUTPUT"
+          fi
+        fi
+      shell: bash
+    - id: current_branch
+      run: |
+        # "Set the current branch name..."
+        if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
+          if [[ ${{ github.event_name }} == *"pull_request"* ]]; then
+            if [[ -z "$GITHUB_OUTPUT" ]]; then
+              echo "::set-output name=current_branch::${{ steps.branch.outputs.head_ref_branch }}"
+            else
+              echo "current_branch=${{ steps.branch.outputs.head_ref_branch }}" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            if [[ -z "$GITHUB_OUTPUT" ]]; then
+              echo "::set-output name=current_branch::${{ steps.branch.outputs.ref_branch }}"
+            else
+              echo "current_branch=${{ steps.branch.outputs.ref_branch }}" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+        fi
+      shell: bash
+    - id: default
+      run: |
+        # "Set the default branch name..."
+        if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
+          if [[ "${{ steps.current_branch.outputs.current_branch }}" == "${{ github.event.repository.default_branch }}" && "${{ github.event.pull_request.head.repo.fork }}" != "true" ]]; then
+            if [[ -z "$GITHUB_OUTPUT" ]]; then
+              echo "::set-output name=is_default::true"
+              echo "::set-output name=default_branch::${{ github.event.repository.default_branch }}"
+            else
+              echo "is_default=true" >> "$GITHUB_OUTPUT"
+              echo "default_branch=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            if [[ -z "$GITHUB_OUTPUT" ]]; then
+              echo "::set-output name=is_default::false"
+              echo "::set-output name=default_branch::${{ github.event.repository.default_branch }}"
+            else
+              echo "is_default=false" >> "$GITHUB_OUTPUT"
+              echo "default_branch=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+        fi
+      shell: bash
+    - id: tag
+      run: |
+        # "Set the tag name..."
+        if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+          REF=$(printf "%q" "${{ github.ref }}")
+          TAG=${REF/refs\/tags\/${{ inputs.strip_tag_prefix }}/}
+
+          if [[ -z "$GITHUB_OUTPUT" ]]; then
+            echo "::set-output name=tag::$(eval printf "%s" "$TAG")"
+            echo "::set-output name=is_tag::true"
+          else
+            echo "tag=$(eval printf "%s" "$TAG")" >> "$GITHUB_OUTPUT"
+            echo "is_tag=true" >> "$GITHUB_OUTPUT"
+          fi
+        else
+          if [[ -z "$GITHUB_OUTPUT" ]]; then
+            echo "::set-output name=is_tag::false"
+          else
+            echo "is_tag=false" >> "$GITHUB_OUTPUT"
+          fi
+        fi
+      shell: bash
+    - id: ci_hostname
+      run: |
+        CI_HOSTNAME=$(echo $GITHUB_SERVER_URL | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
+        echo "::set-output name=gitea_registry $(eval printf "%s" "$CI_HOSTNAME")"
+      shell: bash
+
+branding:
+  icon: git-branch
+  color: white
