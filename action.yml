@@ -139,7 +139,7 @@ runs:
     - id: ci_hostname
       run: |
         CI_HOSTNAME=$(echo $GITHUB_SERVER_URL | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
-        echo "::set-output name=ci_hostname $(eval printf "%s" "$CI_HOSTNAME")"
+        echo "::set-output name=ci_hostname::$(eval printf "%s" "$CI_HOSTNAME")"
       shell: bash
 
 branding:
