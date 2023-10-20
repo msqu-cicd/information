@@ -10,7 +10,7 @@ inputs:
 outputs:
   ci_hostname:
     value: ${{ steps.default.outputs.ci_hostname }}
-    description: "ci server hostname with http(s) prefix"
+    description: 'ci server hostname with http(s) prefix'
   is_default:
     value: ${{ steps.default.outputs.is_default }}
     description: 'Returns `"true"` if the current branch is the default else `"false"`.'
