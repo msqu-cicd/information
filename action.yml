@@ -8,9 +8,6 @@ inputs:
     required: false
 
 outputs:
-  ci_hostname:
-    value: ${{ steps.default.outputs.ci_hostname }}
-    description: 'ci server hostname with http(s) prefix'
   is_default:
     value: ${{ steps.default.outputs.is_default }}
     description: 'Returns `"true"` if the current branch is the default else `"false"`.'
@@ -36,10 +33,14 @@ outputs:
     value: ${{ steps.tag.outputs.tag }}
     description: 'The tag that triggered the workflow run. e.g `v0.0.1`, `0.0.1`'
 
+  ci_hostname:
+    value: ${{ steps.ci_hostname.outputs.ci_hostname }}
+    description: 'ci server hostname with http(s) prefix'
+
 runs:
   using: "composite"
   steps:
-  
+
     - id: branch
       run: |
         # "Set branch names..."
