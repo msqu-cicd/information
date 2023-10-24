@@ -43,6 +43,10 @@ runs:
   using: "composite"
   steps:
 
+    - name: "dummy info step"
+      shell: bash
+      run: echo dummy info step executed
+
     - id: branch
       run: |
         # "Set branch names..."
