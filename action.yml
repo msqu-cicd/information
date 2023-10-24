@@ -8,28 +8,28 @@ inputs:
     required: false
 
 outputs:
-  is_default:
+  git_is_default:
     value: ${{ steps.default.outputs.is_default }}
     description: 'Returns `"true"` if the current branch is the default else `"false"`.'
-  is_tag:
+  git_is_tag:
     value: ${{ steps.tag.outputs.is_tag }}
     description: 'Returns `"true"` if the current branch is a tag else `"false"`.'
-  default_branch:
+  git_default_branch:
     value: ${{ steps.default.outputs.default_branch }}
     description: 'The default branch name e.g `main` OR `master`'
-  current_branch:
+  git_current_branch:
     value: ${{ steps.current_branch.outputs.current_branch }}
     description: 'The current branch name regardless of event_type e.g `main`, `feature/test`'
-  base_ref_branch:
+  git_base_ref_branch:
     value: ${{ steps.branch.outputs.base_ref_branch }}
     description: 'The target branch of a pull request or tag e.g `main`'
-  head_ref_branch:
+  git_head_ref_branch:
     value: ${{ steps.branch.outputs.head_ref_branch }}
     description: 'The source branch of a pull request e.g `feature/test`'
-  ref_branch:
+  git_ref_branch:
     value: ${{ steps.branch.outputs.ref_branch }}
     description: 'The branch that triggered the workflow run. e.g `1/merge`, `main`'
-  tag:
+  git_tag:
     value: ${{ steps.tag.outputs.tag }}
     description: 'The tag that triggered the workflow run. e.g `v0.0.1`, `0.0.1`'
 
@@ -146,6 +146,7 @@ runs:
       run: |
         CI_HOSTNAME=$(echo $GITHUB_SERVER_URL | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
         echo "::set-output name=ci_hostname::$(eval printf "%s" "$CI_HOSTNAME")"
+        echo "ci_hostname=$CI_HOSTNAME" >> "$GITHUB_OUTPUT"
       shell: bash
 
 branding:
