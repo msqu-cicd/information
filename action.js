@@ -1,8 +1,7 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
-const process = require('process');
-
-import { compareSemVer, isValidSemVer, parseSemVer } from 'semver-parser';
+import * as core from 'actions/core';
+import * as github from '@actions/github';
+import * as process from 'process';
+import * as semverParser from 'semver-parser';
 
 
 try {
@@ -14,6 +13,7 @@ try {
   const isTag = github.context.ref.startsWith("refs/tags/")
   core.setOutput("git_is_tag", isTag ? "true" : "false")
 
+
   if(!isTag) {
     const baseRef = github.context.payload?.pull_request?.base?.ref || process.env.BODY_REF
     const headRef = github.context.payload?.pull_request?.head?.ref || process.env.HEAD_REF
@@ -22,7 +22,7 @@ try {
   }
 
 
-  // const parsed = parseSemVer("1.1.1+abc")
+  // const parsed = semverParser.parseSemVer("1.1.1+abc")
 
 } catch (error) {
   core.setFailed(error.message);
