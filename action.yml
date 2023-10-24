@@ -35,7 +35,9 @@ outputs:
 
   ci_hostname:
     value: ${{ steps.ci_hostname.outputs.ci_hostname }}
-    description: 'ci server hostname with http(s) prefix'
+    description: 'ci server hostname without http(s) prefix'
+  
+  # TODO add ci_registry variable
 
 runs:
   using: "composite"
@@ -62,6 +64,8 @@ runs:
           BASE_REF=${BASE_REF/refs\/heads\/${{ inputs.strip_tag_prefix }}/}
           echo "git_base_ref_branch=$(eval printf "%s" "$BASE_REF")" >> "$GITHUB_OUTPUT"
         fi
+
+        cat $GITHUB_OUTPUT | xargs -d "\n" -L1 echo "::debug::"
       shell: bash
 
     - id: current_branch
@@ -74,6 +78,7 @@ runs:
             echo "git_current_branch=${{ steps.branch.outputs.git_ref_branch }}" >> "$GITHUB_OUTPUT"
           fi
         fi
+        cat $GITHUB_OUTPUT | xargs -d "\n" -L1 echo "::debug::"
       shell: bash
 
     - id: default
@@ -88,6 +93,7 @@ runs:
             echo "git_default_branch=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
           fi
         fi
+        cat $GITHUB_OUTPUT | xargs -d "\n" -L1 echo "::debug::"
       shell: bash
 
     - id: tag
@@ -101,12 +107,14 @@ runs:
         else
           echo "git_is_tag=false" >> "$GITHUB_OUTPUT"
         fi
+        cat $GITHUB_OUTPUT | xargs -d "\n" -L1 echo "::debug::"
       shell: bash
     
     - id: ci_hostname
       run: |
         CI_HOSTNAME=$(echo $GITHUB_SERVER_URL | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
         echo "ci_hostname=$CI_HOSTNAME" >> "$GITHUB_OUTPUT"
+        cat $GITHUB_OUTPUT | xargs -d "\n" -L1 echo "::debug::"
       shell: bash
 
 branding:
