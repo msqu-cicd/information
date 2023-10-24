@@ -4,7 +4,7 @@ author: tj-actions
 inputs:
   strip_tag_prefix:
     description: 'The prefix that should be stripped from the tag e.g `v` -> with a tag `v0.0.1` -> returns `0.0.1`'
-    default: ''
+    default: "false"
     required: false
 
 outputs:
