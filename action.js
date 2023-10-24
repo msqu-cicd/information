@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const process = require('process');
 
-const semverParser = require('semver-parser');
+import { compareSemVer, isValidSemVer, parseSemVer } from 'semver-parser';
 
 
 try {
@@ -22,7 +22,7 @@ try {
   }
 
 
-  // const parsed = semverParser.parseSemVer("1.1.1+abc")
+  // const parsed = parseSemVer("1.1.1+abc")
 
 } catch (error) {
   core.setFailed(error.message);
