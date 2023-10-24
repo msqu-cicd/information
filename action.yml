@@ -40,7 +40,9 @@ outputs:
   # TODO add ci_registry variable
 
 runs:
-  using: "composite"
+  # using: "node20"
+  # main: index.js
+  
   steps:
 
     - name: "dummy info step"

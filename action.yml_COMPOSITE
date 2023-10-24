@@ -1,0 +1,48 @@
+name: Branch Names
+description: Retrieve various information useful for depedent actions
+author: David Hiendl
+inputs:
+  strip_tag_prefix:
+    description: 'The prefix that should be stripped from the tag e.g `v` -> with a tag `v0.0.1` -> returns `0.0.1`'
+    default: ''
+    required: false
+
+outputs:
+  git_is_default:
+    description: 'Returns `"true"` if the current branch is the default else `"false"`.'
+  git_is_tag:
+    description: 'Returns `"true"` if the current branch is a tag else `"false"`.'
+  git_default_branch:
+    description: 'The default branch name e.g `main` OR `master`'
+  git_current_branch:
+    description: 'The current branch name regardless of event_type e.g `main`, `feature/test`'
+  git_base_ref_branch:
+    description: 'The target branch of a pull request or tag e.g `main`'
+  git_head_ref_branch:
+    description: 'The source branch of a pull request e.g `feature/test`'
+  git_ref_branch:
+    description: 'The branch that triggered the workflow run. e.g `1/merge`, `main`'
+  git_tag:
+    description: 'The tag that triggered the workflow run. e.g `v0.0.1`, `0.0.1`'
+
+  ci_hostname:
+    value: ${{ steps.information_hostname.outputs.ci_hostname }}
+    description: 'ci server hostname without http(s) prefix'
+
+  semver_valid:
+    descripton: "Flag indicating if the semver version parsed from a tag is valid"
+  semver_major:
+    description: "Semver major version"
+  semver_minor:
+    description: "Semver minor version"
+  semver_patch:
+    description: "Semver patch version"
+  
+
+runs:
+  using: "node20"
+  main: action.js
+
+branding:
+  icon: git-branch
+  color: white
