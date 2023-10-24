@@ -8,7 +8,8 @@ try {
   // `who-to-greet` input defined in action metadata file
   const stripTaxPrefix = core.getBooleanInput('strip_tag_prefix');
 
-  console.log(JSON.stringify(github.context.payload))
+  console.log(JSON.stringify(github.context))
+  console.log("github.context.ref="+github.context.ref)
   
   const isTag = github.context.ref.startsWith("refs/tags/")
   core.setOutput("git_is_tag", isTag ? "true" : "false")
