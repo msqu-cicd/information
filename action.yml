@@ -9,127 +9,37 @@ inputs:
 
 outputs:
   git_is_default:
-    value: ${{ steps.information_git.outputs.git_is_default }}
     description: 'Returns `"true"` if the current branch is the default else `"false"`.'
   git_is_tag:
-    value: ${{ steps.information_git.outputs.git_is_tag }}
     description: 'Returns `"true"` if the current branch is a tag else `"false"`.'
   git_default_branch:
-    value: ${{ steps.information_git.outputs.git_default_branch }}
     description: 'The default branch name e.g `main` OR `master`'
   git_current_branch:
-    value: ${{ steps.information_git.outputs.git_current_branch }}
     description: 'The current branch name regardless of event_type e.g `main`, `feature/test`'
   git_base_ref_branch:
-    value: ${{ steps.information_git.outputs.git_base_ref_branch }}
     description: 'The target branch of a pull request or tag e.g `main`'
   git_head_ref_branch:
-    value: ${{ steps.information_git.outputs.git_head_ref_branch }}
     description: 'The source branch of a pull request e.g `feature/test`'
   git_ref_branch:
-    value: ${{ steps.information_git.outputs.git_ref_branch }}
     description: 'The branch that triggered the workflow run. e.g `1/merge`, `main`'
   git_tag:
-    value: ${{ steps.information_git.outputs.git_tag }}
     description: 'The tag that triggered the workflow run. e.g `v0.0.1`, `0.0.1`'
 
   ci_hostname:
-    value: ${{ steps.information_hostname.outputs.ci_hostname }}
     description: 'ci server hostname without http(s) prefix'
   
-  # TODO add ci_registry variable
+  semver_valid:
+    description: "Flag indicating if the semver version parsed from a tag is valid"
+  semver_major:
+    description: "Semver major version"
+  semver_minor:
+    description: "Semver minor version"
+  semver_patch:
+    description: "Semver patch version"
 
 runs:
-  # using: "node20"
-  # main: index.js
-  
-  steps:
-
-    - name: "dummy info step"
-      shell: bash
-      run: echo dummy info step executed
-
-    - id: information_git
-      shell: bash
-      run: |
-        echo "::group::gathering git information..."
-
-        # "Set branch names..."
-        if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
-          BASE_REF=$(printf "%q" "${{ github.event.pull_request.base.ref || github.base_ref }}")
-          HEAD_REF=$(printf "%q" "${{ github.event.pull_request.head.ref || github.head_ref }}")
-          REF=$(printf "%q" "${{ github.ref }}")
-
-          BASE_REF=${BASE_REF/refs\/heads\//}
-          HEAD_REF=${HEAD_REF/refs\/heads\//}
-          REF_BRANCH=${REF/refs\/pull\//}
-          REF_BRANCH=${REF_BRANCH/refs\/heads\//}
-          
-          echo "git_base_ref_branch=$(eval printf "%s" "$BASE_REF")" >> "$GITHUB_OUTPUT"
-          echo "git_head_ref_branch=$(eval printf "%s" "$HEAD_REF")" >> "$GITHUB_OUTPUT"
-          echo "git_ref_branch=$(eval printf "%s" "$REF_BRANCH")" >> "$GITHUB_OUTPUT"
-
-          echo "set git_base_ref_branch=$BASE_REF"
-          echo "set git_head_ref_branch=$HEAD_REF"
-          echo "set git_ref_branch=$REF_BRANCH"
-        else
-          BASE_REF=$(printf "%q" "${{ github.event.base_ref }}")
-          BASE_REF=${BASE_REF/refs\/heads\/${{ inputs.strip_tag_prefix }}/}
-          echo "git_base_ref_branch=$(eval printf "%s" "$BASE_REF")" >> "$GITHUB_OUTPUT"
-          echo "set git_base_ref_branch=$BASE_REF"
-        fi
-
-        # "Set the current branch name..."
-        if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
-          if [[ ${{ github.event_name }} == *"pull_request"* ]]; then
-            CURRENT_BRANCH=$HEAD_REF
-          else
-            CURRENT_BRANCH=$REF_BRANCH
-          fi
-          echo "git_current_branch=$CURRENT_BRANCH" >> "$GITHUB_OUTPUT"
-          echo "set git_current_branch=$CURRENT_BRANCH"
-        fi
-
-        # "Set the default branch name..."
-        if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
-          if [[ "$CURRENT_BRANCH" == "${{ github.event.repository.default_branch }}" && "${{ github.event.pull_request.head.repo.fork }}" != "true" ]]; then
-            echo "git_is_default=true" >> "$GITHUB_OUTPUT"
-            echo "git_default_branch=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
-            echo "set git_is_default=true"
-            echo "set git_default_branch=${{ github.event.repository.default_branch }}"
-          else
-            echo "git_is_default=false" >> "$GITHUB_OUTPUT"
-            echo "git_default_branch=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
-            echo "set git_is_default=false"
-            echo "set git_default_branch=${{ github.event.repository.default_branch }}"
-          fi
-        fi
-
-        # "Set the tag name..."
-        if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
-          REF=$(printf "%q" "${{ github.ref }}")
-          TAG=${REF/refs\/tags\/${{ inputs.strip_tag_prefix }}/}
-          echo "git_tag=$(eval printf "%s" "$TAG")" >> "$GITHUB_OUTPUT"
-          echo "git_is_tag=true" >> "$GITHUB_OUTPUT"
-          echo "set git_tag=$TAG"
-          echo "set git_is_tag=true"
-        else
-          echo "git_is_tag=false" >> "$GITHUB_OUTPUT"
-          echo "set git_is_tag=false"
-        fi
-
-        echo "::endgroup::"
-    
-    - id: information_hostname
-      run: |
-        echo "::group::gathering CI information..."
-
-        CI_HOSTNAME=$(echo $GITHUB_SERVER_URL | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
-        echo "ci_hostname=$CI_HOSTNAME" >> "$GITHUB_OUTPUT"
-        echo "set ci_hostname=$CI_HOSTNAME"
-
-        echo "::endgroup::"
-      shell: bash
+  using: "node20"
+  main: action.js
 
 branding:
   icon: git-branch
