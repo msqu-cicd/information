@@ -49,10 +49,8 @@ runs:
 
     - id: information_git
       shell: bash
-      env:
-        ACTIONS_STEP_DEBUG: "true"
       run: |
-        echo gathering git information...
+        echo "::group::gathering git information..."
 
         # "Set branch names..."
         if [[ "${{ github.ref }}" != "refs/tags/"* ]]; then
@@ -69,14 +67,14 @@ runs:
           echo "git_head_ref_branch=$(eval printf "%s" "$HEAD_REF")" >> "$GITHUB_OUTPUT"
           echo "git_ref_branch=$(eval printf "%s" "$REF_BRANCH")" >> "$GITHUB_OUTPUT"
 
-          echo "::debug::git_base_ref_branch=$BASE_REF"
-          echo "::debug::git_head_ref_branch=$HEAD_REF"
-          echo "::debug::git_ref_branch=$REF_BRANCH"
+          echo "set git_base_ref_branch=$BASE_REF"
+          echo "set git_head_ref_branch=$HEAD_REF"
+          echo "set git_ref_branch=$REF_BRANCH"
         else
           BASE_REF=$(printf "%q" "${{ github.event.base_ref }}")
           BASE_REF=${BASE_REF/refs\/heads\/${{ inputs.strip_tag_prefix }}/}
           echo "git_base_ref_branch=$(eval printf "%s" "$BASE_REF")" >> "$GITHUB_OUTPUT"
-          echo "::debug::git_base_ref_branch=$BASE_REF"
+          echo "set git_base_ref_branch=$BASE_REF"
         fi
 
         # "Set the current branch name..."
@@ -87,7 +85,7 @@ runs:
             CURRENT_BRANCH=$REF_BRANCH
           fi
           echo "git_current_branch=$CURRENT_BRANCH" >> "$GITHUB_OUTPUT"
-          echo "::debug::git_current_branch=$CURRENT_BRANCH"
+          echo "set git_current_branch=$CURRENT_BRANCH"
         fi
 
         # "Set the default branch name..."
@@ -95,13 +93,13 @@ runs:
           if [[ "$CURRENT_BRANCH" == "${{ github.event.repository.default_branch }}" && "${{ github.event.pull_request.head.repo.fork }}" != "true" ]]; then
             echo "git_is_default=true" >> "$GITHUB_OUTPUT"
             echo "git_default_branch=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
-            echo "::debug::git_is_default=true"
-            echo "::debug::git_default_branch=${{ github.event.repository.default_branch }}"
+            echo "set git_is_default=true"
+            echo "set git_default_branch=${{ github.event.repository.default_branch }}"
           else
             echo "git_is_default=false" >> "$GITHUB_OUTPUT"
             echo "git_default_branch=${{ github.event.repository.default_branch }}" >> "$GITHUB_OUTPUT"
-            echo "::debug::git_is_default=false"
-            echo "::debug::git_default_branch=${{ github.event.repository.default_branch }}"
+            echo "set git_is_default=false"
+            echo "set git_default_branch=${{ github.event.repository.default_branch }}"
           fi
         fi
 
@@ -111,18 +109,24 @@ runs:
           TAG=${REF/refs\/tags\/${{ inputs.strip_tag_prefix }}/}
           echo "git_tag=$(eval printf "%s" "$TAG")" >> "$GITHUB_OUTPUT"
           echo "git_is_tag=true" >> "$GITHUB_OUTPUT"
-          echo "::debug::git_tag=$TAG"
-          echo "::debug::git_is_tag=true"
+          echo "set git_tag=$TAG"
+          echo "set git_is_tag=true"
         else
           echo "git_is_tag=false" >> "$GITHUB_OUTPUT"
-          echo "::debug::git_is_tag=false"
+          echo "set git_is_tag=false"
         fi
+
+        echo "::endgroup::"
     
     - id: information_hostname
       run: |
+        echo "::group::gathering CI information..."
+
         CI_HOSTNAME=$(echo $GITHUB_SERVER_URL | sed -e 's/[^/]*\/\/\([^@]*@\)\?\([^:/]*\).*/\2/')
         echo "ci_hostname=$CI_HOSTNAME" >> "$GITHUB_OUTPUT"
-        echo "::debug::ci_hostname=$CI_HOSTNAME"
+        echo "set ci_hostname=$CI_HOSTNAME"
+
+        echo "::endgroup::"
       shell: bash
 
 branding:
