@@ -22,11 +22,8 @@ export function collect_git(debug = false, output = false) {
   };
 
   try {
+    // TODO actually strip tag prefix
     const stripTagPrefix = core.getInput('strip_tag_prefix');
-
-    if (debug) {
-      console.log(JSON.stringify(github.context, null, 2));
-    }
 
     r.git_is_tag          = github.context.ref.startsWith('refs/tags/');
     r.git_default_branch  = github.context.payload?.repository?.defaultBranch;

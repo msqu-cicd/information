@@ -29,7 +29,7 @@ outputs:
 
   ci_hostname:
     description: 'ci server hostname without http(s) prefix'
-  
+
   semver_valid:
     description: "Flag indicating if the semver version parsed from a tag is valid"
   semver_major:
@@ -45,7 +45,7 @@ outputs:
 
 runs:
   using: "node20"
-  main: ./dist/action.js
+  main: ./dist/index.js
 
 branding:
   icon: git-branch
