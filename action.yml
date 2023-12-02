@@ -12,6 +12,8 @@ outputs:
     description: 'Returns `"true"` if the current branch is the default else `"false"`.'
   git_is_tag:
     description: 'Returns `"true"` if the current branch is a tag else `"false"`.'
+  git_is_branch:
+    description: 'Returns `"true"` if action is executed for a branch (not Tag, not PR), else `"false"`.'
   git_default_branch:
     description: 'The default branch name e.g `main` OR `master`'
   git_current_branch:
