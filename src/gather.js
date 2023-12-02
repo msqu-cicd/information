@@ -37,8 +37,7 @@ export function gather_information(debug = false, output = false) {
   try {
     const stripTagPrefix = core.getInput("strip_tag_prefix");
 
-    if (debug) console.log(JSON.stringify(github.context));
-    if (debug) console.log("github.context.ref=" + github.context.ref);
+    if (debug) console.log(JSON.stringify(github.context, null, 2));
 
     r.git_is_tag = github.context.ref.startsWith("refs/tags/");
     r.git_default_branch = github.context.payload?.repository?.defaultBranch;
@@ -56,8 +55,8 @@ export function gather_information(debug = false, output = false) {
       r.git_is_branch = true;
     }
 
-    // gather regular branch info, also applies to tags
-    if (r.git_is_tag || r.git_is_branch) {
+    // gather regular branch info
+    if (r.git_is_branch) {
       if (!github.context.ref.startsWith("refs/heads/")) {
         throw new Error(
           "Failed to determine branch for non-PR and non-Tag action",
