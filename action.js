@@ -26,10 +26,10 @@ try {
     console.log("headRef=" + headRef)
     
   } else if(!isTag) {
-    if(!github.context.ref.startsWith("refs/head/")) {
+    if(!github.context.ref.startsWith("refs/heads/")) {
         throw new Error("Failed to determine branch for non-PR and non-Tag action")
     }
-    const currentBranch = github.context.ref.slice("refs/head/".length)
+    const currentBranch = github.context.ref.slice("refs/heads/".length)
     console.log("git_current_branch=" + currentBranch)
     core.setOutput("git_current_branch", currentBranch)
 
