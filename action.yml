@@ -1,10 +1,10 @@
 name: Branch Names
 description: Retrieve github branch or tag information without the /ref/* prefix
-author: tj-actions
+author: David Hiendl
 inputs:
   strip_tag_prefix:
     description: 'The prefix that should be stripped from the tag e.g `v` -> with a tag `v0.0.1` -> returns `0.0.1`'
-    default: "false"
+    default: ""
     required: false
 
 outputs:
@@ -36,6 +36,10 @@ outputs:
     description: "Semver minor version"
   semver_patch:
     description: "Semver patch version"
+  semver_build:
+    description: "Semver build string"
+  semver_pre:
+    description: "Semver pre-release version"
 
 runs:
   using: "node20"
