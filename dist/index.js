@@ -31137,7 +31137,7 @@ function gather_information(debug = false, output = false) {
       if (debug) console.log("baseRef=" + baseRef);
       if (debug) console.log("headRef=" + headRef);
       // TODO support PR data
-    } else if (!git_is_tag) {
+    } else if (!r.git_is_tag) {
       // regular branches
       r.git_is_branch = true;
     }
@@ -31169,7 +31169,7 @@ function gather_information(debug = false, output = false) {
         r.semver_build = parsed.build;
         r.semver_pre = parsed.pre;
       }
-    } else if (git_is_branch) {
+    } else if (r.git_is_branch) {
       const parsed = parseSemVer(r.git_current_branch);
       if (debug) console.log("semver=" + JSON.stringify(parsed));
 
