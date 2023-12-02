@@ -31130,7 +31130,7 @@ function gather_information(debug = false, output = false) {
     r.git_default_branch = github.context.payload?.repository?.defaultBranch;
     r.git_is_pull_request = github.context.payload.pull_request != null;
 
-    if (git_is_pull_request) {
+    if (r.git_is_pull_request) {
       const baseRef = github.context.baseRef || external_process_namespaceObject.env.BODY_REF;
       const headRef =
         github.context.payload?.pull_request?.head?.ref || external_process_namespaceObject.env.HEAD_REF;
@@ -31143,7 +31143,7 @@ function gather_information(debug = false, output = false) {
     }
 
     // gather regular branch info, also applies to tags
-    if (git_is_tag || git_is_branch) {
+    if (r.git_is_tag || r.git_is_branch) {
       if (!github.context.ref.startsWith("refs/heads/")) {
         throw new Error(
           "Failed to determine branch for non-PR and non-Tag action",
@@ -31155,7 +31155,7 @@ function gather_information(debug = false, output = false) {
     }
 
     // parse semver for tags
-    if (git_is_tag) {
+    if (r.git_is_tag) {
       r.git_tag = github.context.ref.slice("refs/tags/".length);
 
       const parsed = parseSemVer(r.git_tag);
