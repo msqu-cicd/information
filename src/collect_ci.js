@@ -13,7 +13,7 @@ export function collect_ci(debug = false, output = false) {
     r.ci_hostname = url.hostname;
 
     if (debug) {
-      console.log('results for output:', JSON.stringify(r, null, 2));
+      console.log('results for collect_ci:', JSON.stringify(r, null, 2));
     }
     if (output) {
       result_to_output(r);
@@ -22,7 +22,7 @@ export function collect_ci(debug = false, output = false) {
     return r;
   }
   catch (error) {
-    console.log('partial results before error: ', JSON.stringify(r, null, 2));
+    console.log('partial results for collect_ci before error: ', JSON.stringify(r, null, 2));
     core.setFailed(error.message);
     process.exit(1);
   }

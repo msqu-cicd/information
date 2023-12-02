@@ -556,7 +556,7 @@ class OidcClient {
             const res = yield httpclient
                 .getJson(id_token_url)
                 .catch(error => {
-                throw new Error(`Failed to get ID Token. \n
+                  throw new Error(`Failed to get ID Token. \n
         Error Code : ${error.statusCode}\n
         Error Message: ${error.message}`);
             });
@@ -30753,7 +30753,7 @@ module.exports = parseParams
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+  /******/
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -30767,7 +30767,7 @@ module.exports = parseParams
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+    /******/
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -30776,11 +30776,12 @@ module.exports = parseParams
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/
+    /******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+
+  /******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
@@ -30792,11 +30793,11 @@ module.exports = parseParams
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/
+  /******/
 /******/ 	/* webpack/runtime/compat */
-/******/
+  /******/
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/
+  /******/
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
@@ -30805,13 +30806,14 @@ var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
 
+  // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+  var github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: external "process"
 const external_process_namespaceObject = require("process");
   ;// CONCATENATED MODULE: ./src/lib.js
+
 
   function result_to_output(results) {
     for (const key in results) {
@@ -30841,7 +30843,7 @@ const external_process_namespaceObject = require("process");
       r.ci_hostname = url.hostname;
 
       if (debug) {
-        console.log('results for output:', JSON.stringify(r, null, 2));
+        console.log('results for collect_ci:', JSON.stringify(r, null, 2));
       }
       if (output) {
         result_to_output(r);
@@ -30850,7 +30852,7 @@ const external_process_namespaceObject = require("process");
       return r;
     }
     catch (error) {
-      console.log('partial results before error: ', JSON.stringify(r, null, 2));
+      console.log('partial results for collect_ci before error: ', JSON.stringify(r, null, 2));
       core.setFailed(error.message);
       external_process_namespaceObject.exit(1);
     }
@@ -31132,60 +31134,66 @@ const promises = {
 
   function collect_git(debug = false, output = false) {
   const r = {
-    git_is_branch: false,
-    git_is_tag: false,
+    git_is_branch     : false,
+    git_is_tag        : false,
     git_is_pull_request: false,
     git_current_branch: false,
-    git_ref_branch: false,
+    git_ref_branch    : false,
     git_is_default_branch: false,
-    git_tag: false,
-    semver_valid: false,
-    semver_major: false,
-    semver_minor: false,
-    semver_patch: false,
-    semver_build: false,
-    semver_pre: false,
+    git_tag           : false,
+    semver_valid      : false,
+    semver_major      : false,
+    semver_minor      : false,
+    semver_patch      : false,
+    semver_build      : false,
+    semver_pre        : false
   };
 
   try {
-    const stripTagPrefix = core.getInput("strip_tag_prefix");
+    // TODO actually strip tag prefix
+    const stripTagPrefix = core.getInput('strip_tag_prefix');
 
-    if (debug) console.log(JSON.stringify(github.context, null, 2));
-
-    r.git_is_tag = github.context.ref.startsWith("refs/tags/");
+    r.git_is_tag = github.context.ref.startsWith('refs/tags/');
     r.git_default_branch = github.context.payload?.repository?.defaultBranch;
     r.git_is_pull_request = github.context.payload.pull_request != null;
 
     if (r.git_is_pull_request) {
       const baseRef = github.context.baseRef || external_process_namespaceObject.env.BODY_REF;
       const headRef =
-        github.context.payload?.pull_request?.head?.ref || external_process_namespaceObject.env.HEAD_REF;
-      if (debug) console.log("baseRef=" + baseRef);
-      if (debug) console.log("headRef=" + headRef);
+              github.context.payload?.pull_request?.head?.ref || external_process_namespaceObject.env.HEAD_REF;
+      if (debug) {
+        console.log('baseRef=' + baseRef);
+      }
+      if (debug) {
+        console.log('headRef=' + headRef);
+      }
       // TODO support PR data
-    } else if (!r.git_is_tag) {
+    }
+    else if (!r.git_is_tag) {
       // regular branches
       r.git_is_branch = true;
     }
 
     // gather regular branch info
     if (r.git_is_branch) {
-      if (!github.context.ref.startsWith("refs/heads/")) {
+      if (!github.context.ref.startsWith('refs/heads/')) {
         throw new Error(
-          "Failed to determine branch for non-PR and non-Tag action",
+          'Failed to determine branch for non-PR and non-Tag action'
         );
       }
-      r.git_current_branch = github.context.ref.slice("refs/heads/".length);
-      r.git_ref_branch = r.git_current_branch; // same as current branch for non-PR, non-Tag
+      r.git_current_branch = github.context.ref.slice('refs/heads/'.length);
+      r.git_ref_branch     = r.git_current_branch; // same as current branch for non-PR, non-Tag
       r.git_is_default_branch = r.git_current_branch == r.git_default_branch;
     }
 
     // parse semver for tags
     if (r.git_is_tag) {
-      r.git_tag = github.context.ref.slice("refs/tags/".length);
+      r.git_tag = github.context.ref.slice('refs/tags/'.length);
 
       const parsed = parseSemVer(r.git_tag);
-      if (debug) console.log("semver=" + JSON.stringify(parsed));
+      if (debug) {
+        console.log('semver=' + JSON.stringify(parsed));
+      }
 
       if (parsed.matches) {
         r.semver_valid = parsed.matches;
@@ -31195,9 +31203,12 @@ const promises = {
         r.semver_build = parsed.build;
         r.semver_pre = parsed.pre;
       }
-    } else if (r.git_is_branch) {
+    }
+    else if (r.git_is_branch) {
       const parsed = parseSemVer(r.git_current_branch);
-      if (debug) console.log("semver=" + JSON.stringify(parsed));
+      if (debug) {
+        console.log('semver=' + JSON.stringify(parsed));
+      }
 
       if (parsed.matches) {
         r.semver_valid = parsed.matches;
@@ -31209,12 +31220,17 @@ const promises = {
       }
     }
 
-    if (debug) console.log("results for output:", JSON.stringify(r, null, 2));
-    if (output) result_to_output(r);
+    if (debug) {
+      console.log('results for collect_git:', JSON.stringify(r, null, 2));
+    }
+    if (output) {
+      result_to_output(r);
+    }
 
     return r;
-  } catch (error) {
-    console.log("partial results before error: ", JSON.stringify(r, null, 2));
+  }
+  catch (error) {
+    console.log('partial results for collect_git before error: ', JSON.stringify(r, null, 2));
     core.setFailed(error.message);
     external_process_namespaceObject.exit(1);
   }
@@ -31224,6 +31240,11 @@ const promises = {
 
 
   function collect_all(debug = false, output = false) {
+
+    if (debug) {
+      console.log(JSON.stringify(github.context, null, 2));
+    }
+
     collect_ci(debug, output);
     collect_git(debug, output);
   }

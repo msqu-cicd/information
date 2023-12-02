@@ -93,7 +93,7 @@ export function collect_git(debug = false, output = false) {
     }
 
     if (debug) {
-      console.log('results for output:', JSON.stringify(r, null, 2));
+      console.log('results for collect_git:', JSON.stringify(r, null, 2));
     }
     if (output) {
       result_to_output(r);
@@ -102,7 +102,7 @@ export function collect_git(debug = false, output = false) {
     return r;
   }
   catch (error) {
-    console.log("partial results before error: ", JSON.stringify(r, null, 2));
+    console.log('partial results for collect_git before error: ', JSON.stringify(r, null, 2));
     core.setFailed(error.message);
     process.exit(1);
   }
