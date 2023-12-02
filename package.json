@@ -2,20 +2,20 @@
   "name": "information",
   "version": "1.0.0",
   "description": "",
-  "main": "action.js",
+  "main": "dist/index.js",
   "scripts": {
-    "bundle": "npm run format:write && npm run package",
+    "bundle": "npm run package",
     "ci-test": "jest",
     "format:write": "prettier --write **/*.js",
     "format:check": "prettier --check **/*.js",
     "lint": "npx eslint . -c ./.github/linters/.eslintrc.yml",
-    "package": "ncc build src/index.js",
+    "package": "ncc build src/action.js",
     "package:watch": "npm run package -- --watch",
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg",
     "all": "npm run format:write && npm run lint && npm run test && npm run package"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./src/index.js"
   },
   "author": "",
   "license": "ISC",

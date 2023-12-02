@@ -556,8 +556,8 @@ class OidcClient {
             const res = yield httpclient
                 .getJson(id_token_url)
                 .catch(error => {
-                throw new Error(`Failed to get ID Token. \n 
-        Error Code : ${error.statusCode}\n 
+                throw new Error(`Failed to get ID Token. \n
+        Error Code : ${error.statusCode}\n
         Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -30753,7 +30753,7 @@ module.exports = parseParams
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -30767,7 +30767,7 @@ module.exports = parseParams
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -30776,11 +30776,11 @@ module.exports = parseParams
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
@@ -30792,11 +30792,11 @@ module.exports = parseParams
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/compat */
-/******/ 	
+/******/
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/ 	
+/******/
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
@@ -30811,6 +30811,51 @@ var core = __nccwpck_require__(2186);
 var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: external "process"
 const external_process_namespaceObject = require("process");
+  ;// CONCATENATED MODULE: ./src/lib.js
+
+  function result_to_output(results) {
+    for (const key in results) {
+      if (!results.hasOwnProperty(key)) {
+        continue;
+      }
+      const value = results[key];
+      if (typeof value !== 'string') {
+        core.setOutput(key, JSON.stringify(value)); // TODO support nested objects with key chaining
+      }
+      else {
+        core.setOutput(key, value);
+      }
+    }
+  }
+
+  ;// CONCATENATED MODULE: ./src/collect_ci.js
+
+
+  function collect_ci(debug = false, output = false) {
+    const r = {
+      ci_hostname: false
+    };
+
+    try {
+      const url     = new URL(github.context.serverUrl);
+      r.ci_hostname = url.hostname;
+
+      if (debug) {
+        console.log('results for output:', JSON.stringify(r, null, 2));
+      }
+      if (output) {
+        result_to_output(r);
+      }
+
+      return r;
+    }
+    catch (error) {
+      console.log('partial results before error: ', JSON.stringify(r, null, 2));
+      core.setFailed(error.message);
+      external_process_namespaceObject.exit(1);
+    }
+  }
+
 ;// CONCATENATED MODULE: ./node_modules/semver-parser/modules/common.js
 /**
  * common.js
@@ -31082,28 +31127,10 @@ const promises = {
  */
 
 
-
-;// CONCATENATED MODULE: ./src/gather.js
-
+  ;// CONCATENATED MODULE: ./src/collect_git.js
 
 
-
-
-function result_to_output(results) {
-  for (const key in results) {
-    if (!results.hasOwnProperty(key)) {
-      continue;
-    }
-    const value = results[key];
-    if (typeof value !== "string") {
-      core.setOutput(key, JSON.stringify(value)); // TODO support nested objects with key chaining
-    } else {
-      core.setOutput(key, value);
-    }
-  }
-}
-
-function gather_information(debug = false, output = false) {
+  function collect_git(debug = false, output = false) {
   const r = {
     git_is_branch: false,
     git_is_tag: false,
@@ -31196,7 +31223,16 @@ function gather_information(debug = false, output = false) {
 ;// CONCATENATED MODULE: ./src/index.js
 
 
-gather_information(true, true);
+  function collect_all(debug = false, output = false) {
+    collect_ci(debug, output);
+    collect_git(debug, output);
+  }
+
+
+  ;// CONCATENATED MODULE: ./src/action.js
+
+
+  collect_all(true, true);
 
 })();
 
