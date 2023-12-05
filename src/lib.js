@@ -14,3 +14,10 @@ export function result_to_output(results) {
     }
   }
 }
+
+export function isTrueString(str) {
+  return str === '1'
+    || str === 'true'
+    || str === 'True'
+    || str === 'TRUE';
+}

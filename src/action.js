@@ -1,5 +1,6 @@
 import {collect_all} from './index';
+import {isTrueString} from './lib';
 
-const debug = process.env['ACTIONS_STEP_DEBUG'] === '1' || process.env['ACTIONS_STEP_DEBUG'] === 'true';
+const debug = isTrueString(process.env['ACTIONS_STEP_DEBUG']);
 
 collect_all(debug, true);
