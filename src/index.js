@@ -12,7 +12,9 @@ export function collect_all(debug = false, output = false) {
     console.log(JSON.stringify(github.context, null, 2));
   }
 
-  collect_ci(debug, output);
-  collect_git(debug, output);
+  return {
+    ...collect_ci(debug, output),
+    ...collect_git(debug, output)
+  };
 }
 
